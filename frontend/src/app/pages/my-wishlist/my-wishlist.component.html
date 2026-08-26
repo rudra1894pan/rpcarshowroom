@@ -1,0 +1,44 @@
+<div class="page">
+  <h1>My Wishlist</h1>
+  <p class="subtitle">Cars you've saved to check out later.</p>
+
+  @if (loading()) {
+    <p class="loading-text">Loading...</p>
+  } @else if (items().length === 0) {
+    <div class="empty-state">
+      <p>You haven't saved any cars yet.</p>
+      <a routerLink="/browse">Browse cars</a>
+    </div>
+  } @else {
+    <div class="grid">
+      @for (item of items(); track item._id) {
+        <div class="card">
+          <button class="remove-heart" (click)="remove(item.car._id)" aria-label="Remove from wishlist">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" />
+            </svg>
+          </button>
+          <a [routerLink]="['/cars', item.car._id]">
+            @if (item.car.images.length) {
+              <img class="car-img" [src]="carService.imageUrl(item.car.images[0])" [alt]="item.car.title" />
+            } @else {
+              <div class="car-img-placeholder">No Photo</div>
+            }
+            <div class="card-body">
+              <span class="tag status-{{ item.car.status }}">{{ item.car.status }}</span>
+              <h3>{{ item.car.title }}</h3>
+              <div class="spec-row">
+                <span>{{ item.car.year }}</span>
+                <span>•</span>
+                <span>{{ item.car.mileageKm | number }} km</span>
+                <span>•</span>
+                <span>{{ item.car.city }}</span>
+              </div>
+              <span class="price">₹{{ item.car.price | number }}</span>
+            </div>
+          </a>
+        </div>
+      }
+    </div>
+  }
+</div>

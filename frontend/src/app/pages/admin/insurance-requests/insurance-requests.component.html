@@ -1,0 +1,97 @@
+<div class="page">
+  <h1>Insurance Requests</h1>
+  <p class="subtitle">Issue or reject insurance quote requests. Buyers are notified by email either way.</p>
+
+  @if (loading()) {
+    <p class="loading-text">Loading...</p>
+  } @else if (requests().length === 0) {
+    <div class="empty-state">
+      <p>No insurance requests yet.</p>
+    </div>
+  } @else {
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Car</th>
+          <th>Buyer</th>
+          <th>Plan</th>
+          <th>Premium</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (r of requests(); track r._id) {
+          <tr>
+            <td>{{ asCar(r).title }}</td>
+            <td>{{ asBuyer(r).name }}<br /><span class="muted-small">{{ asBuyer(r).email }}</span></td>
+            <td>{{ asPlan(r).name }}</td>
+            <td>₹{{ r.calculatedPremium | number }}</td>
+            <td><span class="status-pill status-{{ r.status === 'issued' ? 'confirmed' : r.status }}">{{ r.status }}</span></td>
+            <td class="actions">
+              @if (r.status === 'pending' || r.status === 'quoted') {
+                <button class="btn btn-gold" (click)="openDecision(r, 'issued')">Issue Policy</button>
+                <button class="btn btn-danger" (click)="openDecision(r, 'rejected')">Reject</button>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>
+
+@if (activeRequest()) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>{{ decision === 'issued' ? 'Issue Policy' : 'Reject Request' }}</h2>
+      <p class="muted">
+        {{ asBuyer(activeRequest()!).name }} — {{ asCar(activeRequest()!).title }} —
+        {{ asPlan(activeRequest()!).name }}
+      </p>
+
+      @if (decision === 'issued') {
+        <label>
+          Policy number (auto-generated if left blank)
+          <input type="text" [(ngModel)]="policyNumber" placeholder="e.g. RPCS-20260812" />
+        </label>
+        <div class="form-row">
+          <label>
+            Final premium (₹)
+            <input type="number" [(ngModel)]="finalPremium" />
+          </label>
+          <label>
+            Valid till
+            <input type="date" [(ngModel)]="policyValidTill" />
+          </label>
+        </div>
+        <label>
+          Policy document (optional)
+          <input type="file" accept=".pdf,image/*" (change)="onFileSelected($event)" />
+        </label>
+      }
+
+      <label>
+        Note to buyer (optional, included in the email)
+        <textarea
+          [(ngModel)]="adminNote"
+          rows="3"
+          [placeholder]="decision === 'issued' ? 'e.g. Your policy is active from today.' : 'e.g. We could not verify the required documents.'"
+        ></textarea>
+      </label>
+
+      <div class="modal-actions">
+        <button class="btn btn-outline" (click)="closeModal()">Cancel</button>
+        <button
+          class="btn"
+          [class.btn-gold]="decision === 'issued'"
+          [class.btn-danger]="decision === 'rejected'"
+          [disabled]="submitting()"
+          (click)="confirmDecision()"
+        >
+          {{ submitting() ? 'Sending...' : (decision === 'issued' ? 'Issue & Email Buyer' : 'Reject & Email Buyer') }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

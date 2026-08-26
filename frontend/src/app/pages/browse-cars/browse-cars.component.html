@@ -1,0 +1,112 @@
+<div class="page">
+  <h1>Browse Cars</h1>
+  <p class="subtitle">Find verified second-hand cars from our showroom.</p>
+
+  <div class="search-bar">
+    <input
+      type="text"
+      placeholder="Search by make, model, city..."
+      [(ngModel)]="filters.q"
+      (keyup.enter)="search()"
+    />
+    <button class="btn btn-gold" (click)="search()">Search</button>
+    <button class="btn btn-outline filter-toggle" (click)="showFilters.set(!showFilters())">
+      Filters
+    </button>
+  </div>
+
+  @if (showFilters()) {
+    <form class="filter-panel" (ngSubmit)="search()">
+      <div class="form-row">
+        <label>
+          Make
+          <input type="text" name="make" [(ngModel)]="filters.make" placeholder="e.g. Honda" />
+        </label>
+        <label>
+          City
+          <input type="text" name="city" [(ngModel)]="filters.city" placeholder="e.g. Ahmedabad" />
+        </label>
+      </div>
+      <div class="form-row">
+        <label>
+          Min Price
+          <input type="number" name="minPrice" [(ngModel)]="filters.minPrice" />
+        </label>
+        <label>
+          Max Price
+          <input type="number" name="maxPrice" [(ngModel)]="filters.maxPrice" />
+        </label>
+      </div>
+      <div class="form-row">
+        <label>
+          Fuel Type
+          <select name="fuelType" [(ngModel)]="filters.fuelType">
+            <option value="">Any</option>
+            <option value="petrol">Petrol</option>
+            <option value="diesel">Diesel</option>
+            <option value="electric">Electric</option>
+            <option value="hybrid">Hybrid</option>
+            <option value="cng">CNG</option>
+          </select>
+        </label>
+        <label>
+          Transmission
+          <select name="transmission" [(ngModel)]="filters.transmission">
+            <option value="">Any</option>
+            <option value="manual">Manual</option>
+            <option value="automatic">Automatic</option>
+          </select>
+        </label>
+      </div>
+      <div class="filter-actions">
+        <button type="button" class="btn btn-outline" (click)="clearFilters()">Clear</button>
+        <button type="submit" class="btn btn-gold">Apply Filters</button>
+      </div>
+    </form>
+  }
+
+  @if (loading()) {
+    <p class="loading-text">Loading listings...</p>
+  } @else if (cars().length === 0) {
+    <div class="empty-state">
+      <p>No cars match your search.</p>
+    </div>
+  } @else {
+    <div class="grid">
+      @for (car of cars(); track car._id) {
+        <a [routerLink]="['/cars', car._id]" class="card">
+          <button
+            class="wishlist-btn"
+            [class.active]="wishlist.isWishlisted(car._id)"
+            (click)="toggleWishlist($event, car._id)"
+            aria-label="Toggle wishlist"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" [attr.fill]="wishlist.isWishlisted(car._id) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2">
+              <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" />
+            </svg>
+          </button>
+          @if (car.images.length) {
+            <img class="car-img" [src]="carService.imageUrl(car.images[0])" [alt]="car.title" />
+          } @else {
+            <div class="car-img-placeholder">No Photo</div>
+          }
+          <div class="card-body">
+            <span class="tag status-{{ car.status }}">{{ car.status }}</span>
+            <h3>{{ car.title }}</h3>
+            <div class="spec-row">
+              <span>{{ car.year }}</span>
+              <span>•</span>
+              <span>{{ car.mileageKm | number }} km</span>
+              <span>•</span>
+              <span>{{ car.fuelType }}</span>
+              <span>•</span>
+              <span>{{ car.transmission }}</span>
+            </div>
+            <div class="desc">{{ car.city }}</div>
+            <span class="price">₹{{ car.price | number }}</span>
+          </div>
+        </a>
+      }
+    </div>
+  }
+</div>

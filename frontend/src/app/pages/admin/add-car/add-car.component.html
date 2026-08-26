@@ -1,0 +1,146 @@
+<div class="page narrow">
+  @if (success()) {
+    <div class="info-card success-card">
+      <h2>Listing published!</h2>
+      <p>This car is now live and visible to buyers on Browse Cars.</p>
+      <button class="btn btn-gold" (click)="goToListings()">View All Listings</button>
+    </div>
+  } @else {
+    <h1>List a New Car</h1>
+    <p class="subtitle">This listing goes live immediately once submitted.</p>
+
+    <form class="car-form" (ngSubmit)="submit()">
+      @if (error()) {
+        <div class="error-banner">{{ error() }}</div>
+      }
+
+      <label>
+        Listing title
+        <input type="text" [(ngModel)]="form.title" name="title" placeholder="e.g. 2019 Honda City VX CVT" required />
+      </label>
+
+      <div class="form-row">
+        <label>
+          Make
+          <input type="text" [(ngModel)]="form.make" name="make" required />
+        </label>
+        <label>
+          Model
+          <input type="text" [(ngModel)]="form.model" name="model" required />
+        </label>
+      </div>
+
+      <div class="form-row">
+        <label>
+          Year
+          <input type="number" [(ngModel)]="form.year" name="year" required />
+        </label>
+        <label>
+          Price (₹)
+          <input type="number" [(ngModel)]="form.price" name="price" required />
+        </label>
+      </div>
+
+      <div class="form-row">
+        <label>
+          Mileage (km)
+          <input type="number" [(ngModel)]="form.mileageKm" name="mileageKm" required />
+        </label>
+        <label>
+          Owners
+          <input type="number" [(ngModel)]="form.ownersCount" name="ownersCount" min="1" />
+        </label>
+      </div>
+
+      <div class="form-row">
+        <label>
+          Fuel Type
+          <select [(ngModel)]="form.fuelType" name="fuelType">
+            <option value="petrol">Petrol</option>
+            <option value="diesel">Diesel</option>
+            <option value="electric">Electric</option>
+            <option value="hybrid">Hybrid</option>
+            <option value="cng">CNG</option>
+          </select>
+        </label>
+        <label>
+          Transmission
+          <select [(ngModel)]="form.transmission" name="transmission">
+            <option value="manual">Manual</option>
+            <option value="automatic">Automatic</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="form-row">
+        <label>
+          Color
+          <input type="text" [(ngModel)]="form.color" name="color" />
+        </label>
+        <label>
+          Registration State
+          <input type="text" [(ngModel)]="form.registrationState" name="registrationState" placeholder="e.g. GJ" />
+        </label>
+      </div>
+
+      <label>
+        City
+        <input type="text" [(ngModel)]="form.city" name="city" required />
+      </label>
+
+      <label>
+        Description
+        <textarea [(ngModel)]="form.description" name="description" rows="3"></textarea>
+      </label>
+
+      <div class="section-divider">Insurance Details</div>
+
+      <div class="form-row">
+        <label>
+          Insurance Type
+          <select [(ngModel)]="form.insuranceType" name="insuranceType">
+            <option value="none">None</option>
+            <option value="comprehensive">Comprehensive</option>
+            <option value="third-party">Third-Party</option>
+            <option value="expired">Expired</option>
+          </select>
+        </label>
+        <label>
+          Provider
+          <input type="text" [(ngModel)]="form.insuranceProvider" name="insuranceProvider" placeholder="e.g. ICICI Lombard" />
+        </label>
+      </div>
+
+      <div class="form-row">
+        <label>
+          Valid Till
+          <input type="date" [(ngModel)]="form.insuranceValidTill" name="insuranceValidTill" />
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="form.insuranceTransferable" name="insuranceTransferable" />
+          Insurance is transferable to buyer
+        </label>
+      </div>
+
+      <label>
+        Photos (up to 8)
+        <input type="file" accept="image/*" multiple (change)="onFilesSelected($event)" />
+      </label>
+
+      @if (previews.length) {
+        <div class="preview-grid">
+          @for (src of previews; track src; let i = $index) {
+            <div class="preview-item">
+              <img [src]="src" alt="preview" />
+              <button type="button" class="remove-btn" (click)="removeFile(i)">×</button>
+            </div>
+          }
+        </div>
+      }
+
+      <button type="submit" class="btn btn-gold block" [disabled]="loading()">
+        {{ loading() ? 'Publishing...' : 'Publish Listing' }}
+      </button>
+    </form>
+  }
+</div>

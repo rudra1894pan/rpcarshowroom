@@ -1,0 +1,117 @@
+<div class="page">
+  <div class="header-row">
+    <div>
+      <h1>Insurance Plans</h1>
+      <p class="subtitle">Manage the insurance plans buyers can request quotes for.</p>
+    </div>
+    <button class="btn btn-gold" (click)="startCreate()">+ New Plan</button>
+  </div>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Provider</th>
+        <th>Type</th>
+        <th>Rate</th>
+        <th>Min Premium</th>
+        <th>Active</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (p of plans(); track p._id) {
+        <tr>
+          <td>{{ p.name }}</td>
+          <td>{{ p.provider }}</td>
+          <td>{{ p.planType }}</td>
+          <td>{{ p.premiumRatePercent }}%</td>
+          <td>₹{{ p.minPremium }}</td>
+          <td>{{ p.isActive ? 'Yes' : 'No' }}</td>
+          <td class="actions">
+            <button class="btn btn-outline" (click)="startEdit(p)">Edit</button>
+            <button class="btn btn-danger" (click)="remove(p._id)">Delete</button>
+          </td>
+        </tr>
+      } @empty {
+        <tr><td colspan="7">No insurance plans yet.</td></tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+@if (showForm()) {
+  <div class="modal-overlay" (click)="cancel()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>{{ editingId() ? 'Edit' : 'New' }} Insurance Plan</h2>
+
+      @if (error()) {
+        <div class="error-banner">{{ error() }}</div>
+      }
+
+      <label>
+        Plan name
+        <input [(ngModel)]="form.name" name="name" placeholder="e.g. Comprehensive Shield" />
+      </label>
+      <div class="form-row">
+        <label>
+          Provider
+          <input [(ngModel)]="form.provider" name="provider" placeholder="e.g. ICICI Lombard" />
+        </label>
+        <label>
+          Type
+          <select [(ngModel)]="form.planType" name="planType">
+            <option value="comprehensive">Comprehensive</option>
+            <option value="third-party">Third-Party</option>
+            <option value="zero-dep">Zero Depreciation</option>
+            <option value="engine-protect">Engine Protection</option>
+          </select>
+        </label>
+      </div>
+      <label>
+        Description
+        <textarea [(ngModel)]="form.description" name="description" rows="2"></textarea>
+      </label>
+      <label>
+        Coverage features (comma-separated)
+        <input [(ngModel)]="form.coverageFeatures" name="coverageFeatures" placeholder="e.g. 24x7 assistance, Zero depreciation" />
+      </label>
+
+      <div class="form-row">
+        <label>
+          Duration
+          <select [(ngModel)]="form.durationMonths" name="durationMonths">
+            <option [value]="12">12 months</option>
+            <option [value]="24">24 months</option>
+            <option [value]="36">36 months</option>
+          </select>
+        </label>
+        <label>
+          Premium rate (% of car price)
+          <input type="number" step="0.1" [(ngModel)]="form.premiumRatePercent" name="premiumRatePercent" />
+        </label>
+      </div>
+
+      <div class="form-row">
+        <label>
+          Fixed fee (₹)
+          <input type="number" [(ngModel)]="form.fixedFee" name="fixedFee" />
+        </label>
+        <label>
+          Minimum premium (₹)
+          <input type="number" [(ngModel)]="form.minPremium" name="minPremium" />
+        </label>
+      </div>
+
+      <label class="checkbox-label">
+        <input type="checkbox" [(ngModel)]="form.isActive" name="isActive" />
+        Active (visible to buyers)
+      </label>
+
+      <div class="modal-actions">
+        <button class="btn btn-outline" (click)="cancel()">Cancel</button>
+        <button class="btn btn-gold" (click)="save()">Save</button>
+      </div>
+    </div>
+  </div>
+}

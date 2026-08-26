@@ -1,0 +1,30 @@
+@use '../../shared/styles/common.scss';
+
+.loading-text {
+  color: var(--text-muted);
+  text-align: center;
+  padding: 3rem 0;
+}
+
+.remove-heart {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(10, 10, 12, 0.65);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(224, 82, 82, 0.4);
+  color: var(--danger);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.08);
+  }
+}

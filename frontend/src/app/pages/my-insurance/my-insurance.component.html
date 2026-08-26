@@ -1,0 +1,69 @@
+<div class="page">
+  <h1>My Insurance</h1>
+  <p class="subtitle">Track your insurance quote requests and issued policies.</p>
+
+  @if (loading()) {
+    <p class="loading-text">Loading...</p>
+  } @else if (requests().length === 0) {
+    <div class="empty-state">
+      <p>You haven't requested any insurance quotes yet.</p>
+      <a routerLink="/browse">Browse cars to get a quote</a>
+    </div>
+  } @else {
+    <div class="request-list">
+      @if (payError()) {
+        <div class="error-banner">{{ payError() }}</div>
+      }
+      @for (r of requests(); track r._id) {
+        <div class="request-card">
+          <div class="request-header">
+            <div>
+              <a [routerLink]="['/cars', asCar(r)._id]" class="car-title">{{ asCar(r).title }}</a>
+              <span class="plan-name">{{ asPlan(r).name }} ({{ asPlan(r).provider }})</span>
+            </div>
+            <span class="status-pill status-{{ r.status === 'issued' ? 'confirmed' : r.status }}">{{ r.status }}</span>
+          </div>
+
+          <div class="request-meta">
+            <span>Requested: ₹{{ r.calculatedPremium | number }}/yr</span>
+            @if (r.status === 'issued') {
+              <span>Final premium: ₹{{ (r.finalPremium || r.calculatedPremium) | number }}/yr</span>
+            }
+          </div>
+
+          @if (r.status === 'issued') {
+            <div class="policy-details">
+              <div class="policy-row"><span>Policy Number</span><strong>{{ r.policyNumber }}</strong></div>
+              @if (r.policyValidTill) {
+                <div class="policy-row"><span>Valid Till</span><strong>{{ r.policyValidTill | date: 'mediumDate' }}</strong></div>
+              }
+              @if (r.policyDocument) {
+                <a [href]="assetUrl + r.policyDocument" target="_blank" class="doc-link">Download Policy Document →</a>
+              }
+              <div class="premium-payment">
+                @if (r.paymentStatus === 'paid') {
+                  <span class="status-pill status-confirmed">Premium Paid — ₹{{ (r.finalPremium || r.calculatedPremium) | number }}</span>
+                } @else {
+                  <button class="btn btn-gold pay-btn" [disabled]="payingId() === r._id" (click)="payPremium(r)">
+                    {{ payingId() === r._id ? 'Processing...' : 'Pay Premium — ₹' + (r.finalPremium || r.calculatedPremium) }}
+                  </button>
+                }
+              </div>
+            </div>
+          }
+
+          @if (r.notes) {
+            <p class="note">Your notes: {{ r.notes }}</p>
+          }
+          @if (r.adminNote) {
+            <p class="note admin-note">Showroom note: {{ r.adminNote }}</p>
+          }
+
+          @if (r.status === 'pending' || r.status === 'quoted') {
+            <button class="btn btn-outline cancel-btn" (click)="cancel(r._id)">Cancel Request</button>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

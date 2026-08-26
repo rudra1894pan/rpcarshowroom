@@ -1,0 +1,83 @@
+<div class="page">
+  <h1>Test Ride Bookings</h1>
+  <p class="subtitle">Confirm or reject requests. Buyers are notified by email either way.</p>
+
+  @if (loading()) {
+    <p class="loading-text">Loading...</p>
+  } @else if (bookings().length === 0) {
+    <div class="empty-state">
+      <p>No booking requests yet.</p>
+    </div>
+  } @else {
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Car</th>
+          <th>Buyer</th>
+          <th>Preferred Date</th>
+          <th>Message</th>
+          <th>Insurance</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (b of bookings(); track b._id) {
+          <tr>
+            <td>{{ asCar(b).title }}</td>
+            <td>{{ asBuyer(b).name }}<br /><span class="muted-small">{{ asBuyer(b).email }}</span></td>
+            <td>{{ b.preferredDate | date: 'short' }}</td>
+            <td class="msg-cell">{{ b.message || '—' }}</td>
+            <td>
+              @if (b.wantsInsuranceHelp) {
+                <span class="status-pill status-pending">Requested</span>
+              } @else {
+                <span class="muted-small">—</span>
+              }
+            </td>
+            <td><span class="status-pill status-{{ b.status }}">{{ b.status }}</span></td>
+            <td class="card-actions">
+              @if (b.status === 'pending') {
+                <button class="btn btn-gold" (click)="openDecision(b, 'confirmed')">Confirm</button>
+                <button class="btn btn-danger" (click)="openDecision(b, 'rejected')">Reject</button>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>
+
+@if (activeBooking()) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>{{ decision === 'confirmed' ? 'Confirm' : 'Reject' }} Booking</h2>
+      <p class="muted">
+        {{ asBuyer(activeBooking()!).name }} — {{ asCar(activeBooking()!).title }}
+      </p>
+
+      <label>
+        Note to buyer (optional, included in the email)
+        <textarea
+          [(ngModel)]="adminNote"
+          rows="3"
+          [placeholder]="decision === 'confirmed' ? 'e.g. See you at our showroom at 4 PM.' : 'e.g. This car has been sold already.'"
+        ></textarea>
+      </label>
+
+      <div class="modal-actions">
+        <button class="btn btn-outline" (click)="closeModal()">Cancel</button>
+        <button
+          class="btn"
+          [class.btn-gold]="decision === 'confirmed'"
+          [class.btn-danger]="decision === 'rejected'"
+          [disabled]="submitting()"
+          (click)="confirmDecision()"
+        >
+          {{ submitting() ? 'Sending...' : (decision === 'confirmed' ? 'Confirm & Email Buyer' : 'Reject & Email Buyer') }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

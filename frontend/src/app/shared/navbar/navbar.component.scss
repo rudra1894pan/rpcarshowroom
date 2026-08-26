@@ -1,0 +1,149 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.75rem;
+  background: rgba(10, 10, 12, 0.75);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.3rem;
+  color: var(--gold);
+  letter-spacing: 0.01em;
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  transition: filter 0.25s ease;
+
+  &:hover {
+    filter: brightness(1.15);
+  }
+
+  span {
+    color: var(--text);
+    font-weight: 400;
+    font-size: 0.95rem;
+    font-family: var(--font-body);
+  }
+}
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 34px;
+  height: 34px;
+  background: none;
+  border: none;
+  cursor: pointer;
+
+  span {
+    display: block;
+    height: 2px;
+    background: var(--text);
+    border-radius: 2px;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+}
+
+.links {
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+  flex-wrap: wrap;
+
+  a {
+    position: relative;
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    font-weight: 500;
+    padding: 0.25rem 0;
+    transition: color 0.25s ease;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -3px;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--gold-bright), var(--gold));
+      transition: width 0.3s var(--ease);
+      border-radius: 2px;
+    }
+
+    &.active {
+      color: var(--gold);
+
+      &::after {
+        width: 100%;
+      }
+    }
+
+    &:hover {
+      color: var(--text);
+
+      &::after {
+        width: 100%;
+      }
+    }
+  }
+}
+
+.greeting {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+@media (max-width: 860px) {
+  .hamburger {
+    display: flex;
+  }
+
+  .links {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(10, 10, 12, 0.97);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s var(--ease);
+
+    &.open {
+      max-height: 460px;
+    }
+
+    a,
+    .greeting,
+    button {
+      padding: 1rem 1.75rem;
+      border-bottom: 1px solid var(--border);
+      width: 100%;
+      text-align: left;
+    }
+
+    a::after {
+      display: none;
+    }
+
+    .btn {
+      margin: 0.85rem 1.75rem;
+      width: calc(100% - 3.5rem);
+    }
+  }
+}

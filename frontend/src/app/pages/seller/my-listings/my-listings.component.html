@@ -1,0 +1,44 @@
+<div class="page">
+  <div class="header-row">
+    <div>
+      <h1>My Listings</h1>
+      <p class="subtitle">Cars you've listed for sale.</p>
+    </div>
+    <a routerLink="/seller/add-car" class="btn btn-gold">+ New Listing</a>
+  </div>
+
+  @if (loading()) {
+    <p class="loading-text">Loading...</p>
+  } @else if (cars().length === 0) {
+    <div class="empty-state">
+      <p>You haven't listed any cars yet.</p>
+      <a routerLink="/seller/add-car">List your first car</a>
+    </div>
+  } @else {
+    <div class="grid">
+      @for (car of cars(); track car._id) {
+        <div class="card">
+          @if (car.images.length) {
+            <img class="car-img" [src]="carService.imageUrl(car.images[0])" [alt]="car.title" />
+          } @else {
+            <div class="car-img-placeholder">No Photo</div>
+          }
+          <div class="card-body">
+            <div class="pill-row">
+              <span class="status-pill status-{{ car.approvalStatus }}">{{ car.approvalStatus }}</span>
+              <span class="status-pill status-{{ car.status }}">{{ car.status }}</span>
+            </div>
+            <h3>{{ car.title }}</h3>
+            <span class="price">₹{{ car.price | number }}</span>
+            <div class="card-actions">
+              @if (car.status === 'available') {
+                <button class="btn btn-outline" (click)="markSold(car)">Mark Sold</button>
+              }
+              <button class="btn btn-danger" (click)="remove(car._id)">Delete</button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

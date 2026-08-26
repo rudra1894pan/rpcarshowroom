@@ -1,0 +1,42 @@
+@use '../../shared/styles/common.scss';
+
+.policy-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 780px;
+}
+
+.policy-block {
+  background: linear-gradient(180deg, var(--bg-card), #19191d);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.75rem 2rem;
+  scroll-margin-top: 90px;
+
+  h2 {
+    margin: 0 0 0.3rem;
+    color: var(--gold);
+    font-size: 1.2rem;
+  }
+
+  .updated {
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    margin: 0 0 1.1rem;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  li {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+}

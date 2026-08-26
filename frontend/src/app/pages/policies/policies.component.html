@@ -1,0 +1,22 @@
+<div class="page">
+  <h1>Policies</h1>
+  <p class="subtitle">Insurance, terms, privacy, and cancellation information for RP Car Showroom.</p>
+
+  @if (loading()) {
+    <p class="loading-text">Loading...</p>
+  } @else {
+    <div class="policy-list">
+      @for (entry of policies() | keyvalue; track entry.key) {
+        <section class="policy-block" [id]="entry.key">
+          <h2>{{ entry.value.title }}</h2>
+          <p class="updated">Last updated: {{ entry.value.updatedAt | date: 'mediumDate' }}</p>
+          <ul>
+            @for (line of entry.value.body; track line) {
+              <li>{{ line }}</li>
+            }
+          </ul>
+        </section>
+      }
+    </div>
+  }
+</div>

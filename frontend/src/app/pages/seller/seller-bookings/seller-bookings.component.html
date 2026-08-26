@@ -1,0 +1,33 @@
+<div class="page">
+  <h1>Test Ride Requests</h1>
+  <p class="subtitle">Requests for your listed cars. Our admin team confirms these with buyers by email.</p>
+
+  @if (loading()) {
+    <p class="loading-text">Loading...</p>
+  } @else if (bookings().length === 0) {
+    <div class="empty-state">
+      <p>No test ride requests yet.</p>
+    </div>
+  } @else {
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Car</th>
+          <th>Buyer</th>
+          <th>Preferred Date</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (b of bookings(); track b._id) {
+          <tr>
+            <td>{{ asCar(b).title }}</td>
+            <td>{{ asBuyer(b).name }}</td>
+            <td>{{ b.preferredDate | date: 'short' }}</td>
+            <td><span class="status-pill status-{{ b.status }}">{{ b.status }}</span></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

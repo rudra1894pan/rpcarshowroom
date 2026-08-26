@@ -1,0 +1,38 @@
+<div class="page">
+  <h1>Pending Sellers</h1>
+  <p class="subtitle">Approve or reject seller applications. Applicants are notified by email.</p>
+
+  @if (loading()) {
+    <p class="loading-text">Loading...</p>
+  } @else if (sellers().length === 0) {
+    <div class="empty-state">
+      <p>No pending seller applications.</p>
+    </div>
+  } @else {
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Dealership</th>
+          <th>City</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (s of sellers(); track s._id) {
+          <tr>
+            <td>{{ s.name }}</td>
+            <td>{{ s.email }}</td>
+            <td>{{ s.dealershipName || '—' }}</td>
+            <td>{{ s.city || '—' }}</td>
+            <td class="actions">
+              <button class="btn btn-gold" (click)="decide(s._id, 'approved')">Approve</button>
+              <button class="btn btn-danger" (click)="decide(s._id, 'rejected')">Reject</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

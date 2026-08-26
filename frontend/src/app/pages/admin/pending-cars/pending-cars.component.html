@@ -1,0 +1,40 @@
+<div class="page">
+  <h1>Pending Listings</h1>
+  <p class="subtitle">Review new car listings from sellers before they go live to buyers.</p>
+
+  @if (loading()) {
+    <p class="loading-text">Loading...</p>
+  } @else if (cars().length === 0) {
+    <div class="empty-state">
+      <p>No listings awaiting review.</p>
+    </div>
+  } @else {
+    <div class="grid">
+      @for (car of cars(); track car._id) {
+        <div class="card">
+          @if (car.images.length) {
+            <img class="car-img" [src]="carService.imageUrl(car.images[0])" [alt]="car.title" />
+          } @else {
+            <div class="car-img-placeholder">No Photo</div>
+          }
+          <div class="card-body">
+            <h3>{{ car.title }}</h3>
+            <div class="spec-row">
+              <span>{{ car.year }}</span>
+              <span>•</span>
+              <span>{{ car.mileageKm | number }} km</span>
+              <span>•</span>
+              <span>{{ car.city }}</span>
+            </div>
+            <div class="desc">Seller: {{ asSeller(car).dealershipName || asSeller(car).name }} ({{ asSeller(car).email }})</div>
+            <span class="price">₹{{ car.price | number }}</span>
+            <div class="card-actions">
+              <button class="btn btn-gold" (click)="decide(car._id, 'approved')">Approve</button>
+              <button class="btn btn-danger" (click)="decide(car._id, 'rejected')">Reject</button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

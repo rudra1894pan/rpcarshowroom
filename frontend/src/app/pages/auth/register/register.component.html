@@ -1,0 +1,41 @@
+<div class="auth-page">
+  <form class="auth-card" (ngSubmit)="submit()">
+    <h1>Create account</h1>
+    <p class="subtitle">Join RP Car Showroom</p>
+
+    @if (error()) {
+      <div class="error-banner">{{ error() }}</div>
+    }
+
+    <label>
+      Full name
+      <input type="text" name="name" [(ngModel)]="name" required />
+    </label>
+
+    <label>
+      Email
+      <input type="email" name="email" [(ngModel)]="email" required />
+    </label>
+
+    <label>
+      Phone
+      <input type="tel" name="phone" [(ngModel)]="phone" />
+    </label>
+
+    <label>
+      City
+      <input type="text" name="city" [(ngModel)]="city" />
+    </label>
+
+    <label>
+      Password
+      <input type="password" name="password" [(ngModel)]="password" required minlength="6" />
+    </label>
+
+    <button type="submit" [disabled]="loading()">
+      {{ loading() ? 'Creating account...' : 'Register' }}
+    </button>
+
+    <p class="switch">Already have an account? <a routerLink="/login">Login</a></p>
+  </form>
+</div>

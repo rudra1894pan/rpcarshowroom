@@ -1,0 +1,35 @@
+<div class="page">
+  <h1>All Listings</h1>
+  <p class="subtitle">Every car listing on the platform, regardless of status.</p>
+
+  @if (loading()) {
+    <p class="loading-text">Loading...</p>
+  } @else if (cars().length === 0) {
+    <div class="empty-state">
+      <p>No listings yet.</p>
+    </div>
+  } @else {
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Seller</th>
+          <th>Price</th>
+          <th>Approval</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (car of cars(); track car._id) {
+          <tr>
+            <td>{{ car.title }}</td>
+            <td>{{ asSeller(car).dealershipName || asSeller(car).name }}</td>
+            <td>₹{{ car.price | number }}</td>
+            <td><span class="status-pill status-{{ car.approvalStatus }}">{{ car.approvalStatus }}</span></td>
+            <td><span class="status-pill status-{{ car.status }}">{{ car.status }}</span></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

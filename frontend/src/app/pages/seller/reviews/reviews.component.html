@@ -1,0 +1,27 @@
+<div class="page">
+  <h1>My Reviews</h1>
+  <p class="subtitle">Feedback buyers have left on your car listings.</p>
+
+  @if (loading()) {
+    <p class="loading-text">Loading...</p>
+  } @else if (reviews().length === 0) {
+    <div class="empty-state">
+      <p>No reviews yet.</p>
+    </div>
+  } @else {
+    <div class="review-list">
+      @for (r of reviews(); track r._id) {
+        <div class="review-card">
+          <div class="review-header">
+            <strong>{{ asCar(r).title }}</strong>
+            <span class="stars">{{ stars(r.rating) }}</span>
+          </div>
+          <p class="reviewer">{{ asBuyer(r).name }} · {{ r.createdAt | date: 'mediumDate' }}</p>
+          @if (r.comment) {
+            <p class="comment">{{ r.comment }}</p>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

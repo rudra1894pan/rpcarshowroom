@@ -1,0 +1,38 @@
+<div class="page narrow">
+  <h1>Sell Your Car</h1>
+  <p class="subtitle">Apply to become a verified seller on RP Car Showroom.</p>
+
+  @if (!auth.isLoggedIn()) {
+    <div class="info-card">
+      <p>Please log in or create an account first.</p>
+      <a routerLink="/login" class="btn btn-gold">Login</a>
+    </div>
+  } @else if (auth.sellerStatus() === 'approved') {
+    <div class="info-card success-card">
+      <p>You're an approved seller! Head to your dashboard to list a car.</p>
+      <a routerLink="/seller" class="btn btn-gold">Go to Seller Dashboard</a>
+    </div>
+  } @else if (auth.sellerStatus() === 'pending') {
+    <div class="info-card">
+      <p>Your seller application is under review. We'll notify you by email once it's approved.</p>
+    </div>
+  } @else {
+    <form class="car-form" (ngSubmit)="submit()">
+      @if (error()) {
+        <div class="error-banner">{{ error() }}</div>
+      }
+      @if (auth.sellerStatus() === 'rejected') {
+        <div class="error-banner">Your previous application was not approved. You can reapply below.</div>
+      }
+
+      <label>
+        Dealership / Shop name (optional)
+        <input type="text" [(ngModel)]="dealershipName" name="dealershipName" placeholder="e.g. RP Approved Motors" />
+      </label>
+
+      <button type="submit" class="btn btn-gold block" [disabled]="loading()">
+        {{ loading() ? 'Submitting...' : 'Apply as Seller' }}
+      </button>
+    </form>
+  }
+</div>

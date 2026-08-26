@@ -1,0 +1,52 @@
+<div class="page">
+  <h1>My Bookings</h1>
+  <p class="subtitle">Track your test-ride requests and their status.</p>
+
+  @if (loading()) {
+    <p class="loading-text">Loading...</p>
+  } @else if (bookings().length === 0) {
+    <div class="empty-state">
+      <p>You haven't requested any test rides yet.</p>
+      <a routerLink="/browse">Browse cars</a>
+    </div>
+  } @else {
+    <div class="booking-list">
+      @if (payError()) {
+        <div class="error-banner">{{ payError() }}</div>
+      }
+      @for (b of bookings(); track b._id) {
+        <div class="booking-card">
+          <div class="booking-header">
+            <a [routerLink]="['/cars', asCar(b)._id]" class="car-title">{{ asCar(b).title }}</a>
+            <span class="status-pill status-{{ b.status }}">{{ b.status }}</span>
+          </div>
+          <div class="booking-meta">
+            <span>Requested for: {{ b.preferredDate | date: 'medium' }}</span>
+            <span>₹{{ asCar(b).price | number }}</span>
+          </div>
+          @if (b.message) {
+            <p class="note">Your note: {{ b.message }}</p>
+          }
+          @if (b.wantsInsuranceHelp) {
+            <p class="note">Insurance help requested{{ b.insuranceNotes ? ': ' + b.insuranceNotes : '.' }}</p>
+          }
+          @if (b.adminNote) {
+            <p class="note admin-note">Showroom note: {{ b.adminNote }}</p>
+          }
+
+          @if (b.status === 'confirmed') {
+            <div class="deposit-row">
+              @if (b.paymentStatus === 'paid') {
+                <span class="status-pill status-confirmed">Deposit Paid — ₹{{ b.depositAmount | number }}</span>
+              } @else {
+                <button class="btn btn-gold pay-btn" [disabled]="payingId() === b._id" (click)="payDeposit(b)">
+                  {{ payingId() === b._id ? 'Processing...' : 'Pay Deposit — ₹' + b.depositAmount }}
+                </button>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

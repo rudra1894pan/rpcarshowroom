@@ -1,0 +1,39 @@
+<nav class="navbar">
+  <a routerLink="/" class="brand" (click)="closeMenu()">
+    RP <span>Car Showroom</span>
+  </a>
+
+  <button class="hamburger" (click)="toggleMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+
+  <div class="links" [class.open]="menuOpen()">
+    <a routerLink="/browse" routerLinkActive="active" (click)="closeMenu()">Browse Cars</a>
+    <a routerLink="/policies" routerLinkActive="active" (click)="closeMenu()">Policies</a>
+
+    @if (auth.isApprovedSeller()) {
+      <a routerLink="/seller" routerLinkActive="active" (click)="closeMenu()">Seller Dashboard</a>
+    } @else if (auth.isLoggedIn() && !auth.isAdmin()) {
+      <a routerLink="/sell" routerLinkActive="active" (click)="closeMenu()">Sell Your Car</a>
+    }
+
+    @if (auth.isLoggedIn() && !auth.isAdmin() && !auth.isApprovedSeller()) {
+      <a routerLink="/my-bookings" routerLinkActive="active" (click)="closeMenu()">My Bookings</a>
+      <a routerLink="/my-insurance" routerLinkActive="active" (click)="closeMenu()">My Insurance</a>
+      <a routerLink="/my-wishlist" routerLinkActive="active" (click)="closeMenu()">Wishlist</a>
+    }
+
+    @if (auth.isAdmin()) {
+      <a routerLink="/admin" routerLinkActive="active" (click)="closeMenu()">Admin</a>
+    }
+
+    @if (auth.isLoggedIn()) {
+      <app-notification-bell></app-notification-bell>
+      <span class="greeting">Hi, {{ auth.user()?.name }}</span>
+      <button class="btn btn-outline" (click)="logout()">Logout</button>
+    } @else {
+      <a routerLink="/login" routerLinkActive="active" (click)="closeMenu()">Login</a>
+      <a routerLink="/register" class="btn btn-gold" (click)="closeMenu()">Register</a>
+    }
+  </div>
+</nav>
