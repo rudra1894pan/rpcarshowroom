@@ -2,6 +2,7 @@ import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CarService } from '../../../core/services/car.service';
+import { ReconItem } from '../../../core/models/models';
 
 interface CarForm {
   title: string;
@@ -21,6 +22,10 @@ interface CarForm {
   insuranceProvider: string;
   insuranceValidTill: string;
   insuranceTransferable: boolean;
+  purchasePrice: number | null;
+  biddingEnabled: boolean;
+  minBid: number | null;
+  biddingEndsAt: string;
 }
 
 @Component({
@@ -49,7 +54,38 @@ export class AdminAddCarComponent {
     insuranceProvider: '',
     insuranceValidTill: '',
     insuranceTransferable: true,
+    purchasePrice: null,
+    biddingEnabled: false,
+    minBid: null,
+    biddingEndsAt: '',
   };
+
+  categories: ReconItem['category'][] = ['service', 'repair', 'modification', 'paint', 'tyres', 'interior', 'documents', 'other'];
+  recon: ReconItem[] = [];
+
+  categoryLabels: Record<string, string> = {
+    service: 'Service',
+    repair: 'Repair',
+    modification: 'Modification',
+    paint: 'Paint',
+    tyres: 'Tyres',
+    interior: 'Interior',
+    documents: 'Documents',
+    other: 'Other',
+  };
+
+  addRecon(category: ReconItem['category'] = 'service') {
+    this.recon.push({ category, description: '', cost: 0 });
+  }
+  removeRecon(i: number) {
+    this.recon.splice(i, 1);
+  }
+  get reconTotal() {
+    return this.recon.reduce((sum, r) => sum + (Number(r.cost) || 0), 0);
+  }
+  get totalInvested() {
+    return (Number(this.form.purchasePrice) || 0) + this.reconTotal;
+  }
 
   selectedFiles: File[] = [];
   previews: string[] = [];
@@ -84,8 +120,17 @@ export class AdminAddCarComponent {
     }
 
     const fd = new FormData();
-    Object.entries(this.form).forEach(([key, value]) => fd.append(key, String(value)));
+    Object.entries(this.form).forEach(([key, value]) => {
+      if (value === null || value === undefined) return;
+      fd.append(key, String(value));
+    });
+    fd.append('reconditioning', JSON.stringify(this.recon.filter((r) => r.description.trim())));
     this.selectedFiles.forEach((file) => fd.append('images', file));
+
+    if (this.form.biddingEnabled && this.form.minBid && this.form.minBid > this.form.price) {
+      this.error.set('Minimum bid cannot be higher than the asking price.');
+      return;
+    }
 
     this.loading.set(true);
     this.carService.create(fd).subscribe({

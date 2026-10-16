@@ -14,6 +14,7 @@ const reviewRoutes = require('./routes/reviewRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const wishlistRoutes = require('./routes/wishlistRoutes');
+const bidRoutes = require('./routes/bidRoutes');
 
 const app = express();
 
@@ -52,6 +53,7 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/wishlist', wishlistRoutes);
+app.use('/api/bids', bidRoutes);
 
 app.use((req, res) => res.status(404).json({ message: 'Route not found' }));
 

@@ -57,6 +57,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'my-bids',
+    loadComponent: () => import('./pages/my-bids/my-bids.component').then((m) => m.MyBidsComponent),
+    canActivate: [authGuard],
+  },
+  {
     path: 'my-wishlist',
     loadComponent: () =>
       import('./pages/my-wishlist/my-wishlist.component').then((m) => m.MyWishlistComponent),
@@ -97,6 +102,11 @@ export const routes: Routes = [
           import('./pages/seller/bookings/bookings.component').then(
             (m) => m.SellerBookingsComponent
           ),
+      },
+      {
+        path: 'bids',
+        loadComponent: () =>
+          import('./pages/bids/manage-bids.component').then((m) => m.ManageBidsComponent),
       },
       {
         path: 'reviews',
@@ -150,6 +160,11 @@ export const routes: Routes = [
           import('./pages/admin/all-bookings/all-bookings.component').then(
             (m) => m.AllBookingsComponent
           ),
+      },
+      {
+        path: 'bids',
+        loadComponent: () =>
+          import('./pages/bids/manage-bids.component').then((m) => m.ManageBidsComponent),
       },
       {
         path: 'insurance-plans',

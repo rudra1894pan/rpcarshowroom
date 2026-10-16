@@ -1,0 +1,41 @@
+<div class="page">
+  <h1>My Bids</h1>
+  <p class="subtitle">Track your offers on cars. The seller accepts the best bid.</p>
+
+  @if (loading()) {
+    <p class="loading-text">Loading...</p>
+  } @else if (bids().length === 0) {
+    <div class="empty-state">
+      <p>You haven't placed any bids yet.</p>
+      <a routerLink="/browse">Browse cars</a>
+    </div>
+  } @else {
+    @for (b of bids(); track b._id) {
+      <div class="bid-card">
+        @if (b.car.images.length) {
+          <img [src]="carService.imageUrl(b.car.images[0])" [alt]="b.car.title" />
+        } @else {
+          <div class="car-img-placeholder">No Photo</div>
+        }
+        <div class="info">
+          <h3><a [routerLink]="['/cars', b.car._id]">{{ b.car.title }}</a></h3>
+          <div class="muted small-text">
+            Your bid <strong class="gold-text">₹{{ b.amount | number }}</strong>
+            · Highest ₹{{ b.highest | number }} · Asking ₹{{ b.car.price | number }}
+          </div>
+          <div class="muted small-text">{{ b.createdAt | date: 'medium' }}</div>
+        </div>
+        <span class="status-pill"
+              [class.bid-active]="label(b) === 'leading'"
+              [class.bid-outbid]="label(b) === 'outbid'"
+              [class.bid-accepted]="b.status === 'accepted'"
+              [class.bid-rejected]="b.status === 'rejected' || b.status === 'withdrawn'">
+          {{ label(b) }}
+        </span>
+        @if (b.status === 'active') {
+          <button class="btn btn-outline" (click)="withdraw(b)">Withdraw</button>
+        }
+      </div>
+    }
+  }
+</div>

@@ -2,6 +2,36 @@ const Car = require('../models/Car');
 const User = require('../models/User');
 const { notify } = require('../utils/notify');
 
+// Pulls the purchase-cost / reconditioning / bidding fields out of the (multipart) body
+// and returns them parsed, plus the remaining fields.
+const num = (v) => (v === undefined || v === '' || v === null || isNaN(Number(v)) ? undefined : Number(v));
+const extractExtras = (body) => {
+  const { purchasePrice, reconditioning, biddingEnabled, minBid, biddingEndsAt, ...rest } = body;
+  const extras = {};
+  if (purchasePrice !== undefined) extras.purchasePrice = num(purchasePrice);
+  if (reconditioning !== undefined) {
+    let items = reconditioning;
+    if (typeof items === 'string') {
+      try {
+        items = JSON.parse(items || '[]');
+      } catch (e) {
+        throw new Error('Invalid reconditioning list');
+      }
+    }
+    extras.reconditioning = (Array.isArray(items) ? items : [])
+      .filter((r) => r && String(r.description || '').trim() && Number(r.cost) >= 0)
+      .map((r) => ({
+        category: r.category || 'other',
+        description: String(r.description).trim(),
+        cost: Number(r.cost) || 0,
+      }));
+  }
+  if (biddingEnabled !== undefined) extras.biddingEnabled = biddingEnabled === true || biddingEnabled === 'true';
+  if (minBid !== undefined) extras.minBid = num(minBid);
+  if (biddingEndsAt !== undefined) extras.biddingEndsAt = biddingEndsAt ? new Date(biddingEndsAt) : undefined;
+  return { extras, rest };
+};
+
 exports.createCar = async (req, res) => {
   try {
     const images = (req.files || []).map((f) => `/uploads/${f.filename}`);
@@ -11,8 +41,10 @@ exports.createCar = async (req, res) => {
       validTill: req.body.insuranceValidTill || undefined,
       isTransferable: req.body.insuranceTransferable !== 'false',
     };
+    const { extras, rest: body } = extractExtras(req.body);
     const car = await Car.create({
-      ...req.body,
+      ...body,
+      ...extras,
       seller: req.user._id,
       images,
       insurance,
@@ -97,10 +129,11 @@ exports.updateCar = async (req, res) => {
     }
 
     const newImages = (req.files || []).map((f) => `/uploads/${f.filename}`);
+    const { extras, rest: body } = extractExtras(req.body);
     const { insuranceType, insuranceProvider, insuranceValidTill, insuranceTransferable, ...rest } =
-      req.body;
+      body;
 
-    Object.assign(car, rest);
+    Object.assign(car, rest, extras);
     if (insuranceType || insuranceProvider || insuranceValidTill || insuranceTransferable) {
       car.insurance = {
         type: insuranceType || car.insurance?.type || 'none',
@@ -135,6 +168,7 @@ exports.deleteCar = async (req, res) => {
       return res.status(403).json({ message: 'Not authorized to delete this listing' });
     }
     await car.deleteOne();
+    await require('../models/Bid').deleteMany({ car: car._id });
     res.json({ message: 'Listing deleted' });
   } catch (err) {
     res.status(500).json({ message: err.message });

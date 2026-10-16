@@ -61,6 +61,74 @@
         </div>
       }
 
+      @if (car()!.purchasePrice || car()!.reconditioning?.length) {
+        <div class="invest-box">
+          <h3>Dealer investment &amp; reconditioning</h3>
+          <p class="muted small-text">What the dealer paid and spent to make this car ready for the road.</p>
+          <table class="invest-table">
+            @if (car()!.purchasePrice) {
+              <tr><td>Bought for</td><td>₹{{ car()!.purchasePrice | number }}</td></tr>
+            }
+            @for (r of car()!.reconditioning; track $index) {
+              <tr>
+                <td><span class="cat">{{ r.category }}</span> {{ r.description }}</td>
+                <td>₹{{ r.cost | number }}</td>
+              </tr>
+            }
+            @if (car()!.reconditioning?.length) {
+              <tr class="sub"><td>Spent on work</td><td>₹{{ car()!.reconditioningTotal | number }}</td></tr>
+            }
+            <tr class="sub"><td>Total invested</td><td>₹{{ car()!.totalInvested | number }}</td></tr>
+            <tr class="ask"><td>Asking price</td><td>₹{{ car()!.price | number }}</td></tr>
+          </table>
+        </div>
+      }
+
+      @if (bidsOpen()) {
+        <div class="bid-box">
+          <h3>Place a bid</h3>
+          <div class="bid-stats">
+            <div>
+              <span>Highest bid</span>
+              <strong>{{ bidSummary()!.highest ? '₹' + (bidSummary()!.highest | number) : 'No bids yet' }}</strong>
+            </div>
+            <div><span>Total bids</span><strong>{{ bidSummary()!.count }}</strong></div>
+            @if (bidSummary()!.minBid) {
+              <div><span>Minimum bid</span><strong>₹{{ bidSummary()!.minBid | number }}</strong></div>
+            }
+          </div>
+          @if (bidSummary()!.endsAt) {
+            <p class="muted small-text">Bidding ends {{ bidSummary()!.endsAt | date: 'medium' }}</p>
+          }
+          <p class="muted small-text">The seller picks the best offer and the car is sold to that bidder.</p>
+          @if (!auth.isLoggedIn()) {
+            <a routerLink="/login" class="btn btn-gold block">Login to bid</a>
+          } @else if (canBid()) {
+            <form (ngSubmit)="submitBid()">
+              @if (bidError()) {
+                <div class="error-banner">{{ bidError() }}</div>
+              }
+              @if (bidSuccess()) {
+                <div class="success-banner">{{ bidSuccess() }}</div>
+              }
+              <label>
+                Your bid (₹)
+                <input type="number" [(ngModel)]="bidAmount" name="bidAmount" [min]="minNextBid()" [placeholder]="'At least ' + minNextBid()" />
+              </label>
+              <label>
+                Note to seller (optional)
+                <input type="text" [(ngModel)]="bidNote" name="bidNote" maxlength="300" />
+              </label>
+              <button type="submit" class="btn btn-gold block" [disabled]="bidSubmitting()">
+                {{ bidSubmitting() ? 'Placing bid...' : 'Place Bid' }}
+              </button>
+            </form>
+          } @else {
+            <p class="muted small-text">You cannot bid on your own listing or as an admin.</p>
+          }
+        </div>
+      }
+
       <div class="insurance-box">
         <h3>Insurance</h3>
         <div class="insurance-row">

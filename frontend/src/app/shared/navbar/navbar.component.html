@@ -17,6 +17,10 @@
       <a routerLink="/sell" routerLinkActive="active" (click)="closeMenu()">Sell Your Car</a>
     }
 
+    @if (auth.isLoggedIn() && !auth.isAdmin()) {
+      <a routerLink="/my-bids" routerLinkActive="active" (click)="closeMenu()">My Bids</a>
+    }
+
     @if (auth.isLoggedIn() && !auth.isAdmin() && !auth.isApprovedSeller()) {
       <a routerLink="/my-bookings" routerLinkActive="active" (click)="closeMenu()">My Bookings</a>
       <a routerLink="/my-insurance" routerLinkActive="active" (click)="closeMenu()">My Insurance</a>

@@ -1,0 +1,80 @@
+<div class="page">
+  <h1>Bids</h1>
+  <p class="subtitle">Compare offers on your cars and sell to the best bidder.</p>
+
+  @if (error()) {
+    <div class="error-banner">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="loading-text">Loading...</p>
+  } @else if (groups().length === 0) {
+    <div class="empty-state"><p>No bids yet. Enable bidding when listing a car.</p></div>
+  } @else {
+    @for (g of groups(); track g.car._id) {
+      <div class="bid-group">
+        <div class="bid-group-head">
+          <div>
+            <h3>{{ g.car.title }}</h3>
+            <span class="status-pill status-{{ g.car.status }}">{{ g.car.status }}</span>
+          </div>
+          <div class="figures">
+            <div><span>Asking</span><strong>₹{{ g.car.price | number }}</strong></div>
+            @if (invested(g.car)) {
+              <div><span>Total invested</span><strong>₹{{ invested(g.car) | number }}</strong></div>
+            }
+            @if (g.top) {
+              <div>
+                <span>Best offer</span>
+                <strong>₹{{ g.top.amount | number }}</strong>
+              </div>
+              @if (invested(g.car)) {
+                <div>
+                  <span>Profit at best offer</span>
+                  <strong [class.loss]="g.top.amount < invested(g.car)">
+                    {{ g.top.amount - invested(g.car) >= 0 ? '+' : '-' }}₹{{ (g.top.amount - invested(g.car) >= 0 ? g.top.amount - invested(g.car) : invested(g.car) - g.top.amount) | number }}
+                  </strong>
+                </div>
+              }
+            }
+          </div>
+        </div>
+
+        <div class="bid-table-wrap">
+          <table class="bid-table">
+            <thead>
+              <tr><th>Bidder</th><th>Amount</th><th>Placed</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody>
+              @for (b of g.bids; track b._id) {
+                <tr [class.best]="g.top && g.top._id === b._id">
+                  <td>
+                    <strong>{{ bidder(b).name }}</strong>
+                    <div class="muted small-text">{{ bidder(b).phone || bidder(b).email }}</div>
+                    @if (b.note) {
+                      <div class="muted small-text">“{{ b.note }}”</div>
+                    }
+                  </td>
+                  <td class="amt">
+                    ₹{{ b.amount | number }}
+                    @if (g.top && g.top._id === b._id) {
+                      <span class="best-tag">Best offer</span>
+                    }
+                  </td>
+                  <td class="muted small-text">{{ b.createdAt | date: 'medium' }}</td>
+                  <td><span class="status-pill bid-{{ b.status }}">{{ b.status }}</span></td>
+                  <td class="row-actions">
+                    @if (b.status === 'active' && g.car.status !== 'sold') {
+                      <button class="btn btn-gold" (click)="accept(b)">Accept</button>
+                      <button class="btn btn-outline" (click)="reject(b)">Reject</button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  }
+</div>

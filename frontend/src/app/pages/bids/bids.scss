@@ -1,0 +1,140 @@
+@use '../../shared/styles/common.scss';
+
+.bid-group {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.bid-group-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.9rem;
+
+  h3 {
+    margin: 0 0 0.35rem;
+  }
+}
+
+.figures {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+
+  span {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+  }
+
+  strong {
+    color: var(--gold);
+  }
+
+  .loss {
+    color: var(--danger);
+  }
+}
+
+.bid-table-wrap {
+  overflow-x: auto;
+}
+
+.bid-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 560px;
+
+  th {
+    text-align: left;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 0.6rem 0.5rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  tr.best td {
+    background: rgba(212, 175, 55, 0.07);
+  }
+
+  .amt {
+    font-weight: 700;
+    color: var(--gold);
+    white-space: nowrap;
+  }
+}
+
+.best-tag {
+  display: inline-block;
+  margin-left: 0.4rem;
+  font-size: 0.65rem;
+  background: var(--gold);
+  color: #0a0a0c;
+  border-radius: 999px;
+  padding: 0.05rem 0.5rem;
+}
+
+.row-actions {
+  display: flex;
+  gap: 0.4rem;
+
+  .btn {
+    padding: 0.35rem 0.8rem;
+    font-size: 0.8rem;
+  }
+}
+
+.bid-active { color: var(--gold); }
+.bid-accepted { color: var(--success); }
+.bid-rejected,
+.bid-withdrawn { color: var(--danger); }
+.bid-outbid { color: var(--text-muted); }
+
+.bid-card {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.9rem 1.1rem;
+  margin-bottom: 0.9rem;
+  flex-wrap: wrap;
+
+  img,
+  .car-img-placeholder {
+    width: 110px;
+    height: 76px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+
+  .info {
+    flex: 1;
+    min-width: 180px;
+
+    h3 {
+      margin: 0 0 0.25rem;
+    }
+  }
+
+  .btn {
+    padding: 0.4rem 0.9rem;
+    font-size: 0.8rem;
+  }
+}
+
+.gold-text {
+  color: var(--gold);
+}

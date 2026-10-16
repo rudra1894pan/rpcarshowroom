@@ -122,6 +122,76 @@
         </label>
       </div>
 
+      <div class="section-divider">Purchase &amp; Reconditioning</div>
+      <p class="hint">Show buyers what you paid and how much you invested to make this car ready to drive.</p>
+
+      <label>
+        Bought for (₹)
+        <input type="number" [(ngModel)]="form.purchasePrice" name="purchasePrice" min="0" placeholder="Price you paid to acquire the car" />
+      </label>
+
+      <div class="quick-add">
+        <span>Add work done:</span>
+        @for (c of categories; track c) {
+          <button type="button" class="chip" (click)="addRecon(c)">+ {{ categoryLabels[c] }}</button>
+        }
+      </div>
+
+      @if (recon.length === 0) {
+        <p class="hint empty-hint">No work added yet. Tap a button above to add service, paint, modification, tyres and more.</p>
+      }
+
+      @for (r of recon; track $index; let i = $index) {
+        <div class="recon-card">
+          <div class="recon-grid">
+            <label>
+              Type of work
+              <select [(ngModel)]="r.category" [name]="'rcat' + i">
+                @for (c of categories; track c) {
+                  <option [value]="c">{{ categoryLabels[c] }}</option>
+                }
+              </select>
+            </label>
+            <label>
+              Details
+              <input type="text" [(ngModel)]="r.description" [name]="'rdesc' + i" placeholder="e.g. Full service with oil change" />
+            </label>
+            <label>
+              Cost (₹)
+              <input type="number" [(ngModel)]="r.cost" [name]="'rcost' + i" min="0" />
+            </label>
+          </div>
+          <button type="button" class="recon-remove" (click)="removeRecon(i)">Remove</button>
+        </div>
+      }
+
+      <div class="cost-summary">
+        <div><span>Bought for</span><strong>₹{{ form.purchasePrice || 0 }}</strong></div>
+        <div><span>Spent on work</span><strong>₹{{ reconTotal }}</strong></div>
+        <div><span>Total invested</span><strong>₹{{ totalInvested }}</strong></div>
+        <div><span>Asking price</span><strong>₹{{ form.price || 0 }}</strong></div>
+      </div>
+
+      <div class="section-divider">Bidding</div>
+
+      <label class="checkbox-label">
+        <input type="checkbox" [(ngModel)]="form.biddingEnabled" name="biddingEnabled" />
+        Allow buyers to place bids on this car
+      </label>
+
+      @if (form.biddingEnabled) {
+        <div class="form-row">
+          <label>
+            Minimum bid (₹)
+            <input type="number" [(ngModel)]="form.minBid" name="minBid" min="0" placeholder="Lowest offer you will consider" />
+          </label>
+          <label>
+            Bidding ends (optional)
+            <input type="datetime-local" [(ngModel)]="form.biddingEndsAt" name="biddingEndsAt" />
+          </label>
+        </div>
+      }
+
       <label>
         Photos (up to 8)
         <input type="file" accept="image/*" multiple (change)="onFilesSelected($event)" />

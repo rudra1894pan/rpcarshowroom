@@ -7,9 +7,10 @@ import { BookingService } from '../../core/services/booking.service';
 import { InsurancePlanService } from '../../core/services/insurance-plan.service';
 import { InsuranceRequestService } from '../../core/services/insurance-request.service';
 import { ReviewService } from '../../core/services/review.service';
+import { BidService } from '../../core/services/bid.service';
 import { WishlistService } from '../../core/services/wishlist.service';
 import { AuthService } from '../../core/services/auth.service';
-import { Car, InsurancePlan, Review, User } from '../../core/models/models';
+import { BidSummary, Car, InsurancePlan, Review, User } from '../../core/models/models';
 
 @Component({
   selector: 'app-car-detail',
@@ -41,6 +42,14 @@ export class CarDetailComponent implements OnInit {
   quoteSuccess = signal(false);
   quoteSubmitting = signal(false);
 
+  // Bidding
+  bidSummary = signal<BidSummary | null>(null);
+  bidAmount: number | null = null;
+  bidNote = '';
+  bidError = signal('');
+  bidSuccess = signal('');
+  bidSubmitting = signal(false);
+
   // Reviews
   reviews = signal<Review[]>([]);
   avgRating = signal(0);
@@ -58,6 +67,7 @@ export class CarDetailComponent implements OnInit {
     private planService: InsurancePlanService,
     private requestService: InsuranceRequestService,
     private reviewService: ReviewService,
+    private bidService: BidService,
     public wishlist: WishlistService,
     public auth: AuthService,
     private router: Router
@@ -74,7 +84,63 @@ export class CarDetailComponent implements OnInit {
       error: () => this.loading.set(false),
     });
     this.loadReviews(id);
+    this.loadBids(id);
     if (this.auth.isLoggedIn()) this.wishlist.ensureLoaded();
+  }
+
+  loadBids(carId: string) {
+    this.bidService.summary(carId).subscribe({ next: (s) => this.bidSummary.set(s) });
+  }
+
+  bidsOpen(): boolean {
+    const c = this.car();
+    const s = this.bidSummary();
+    if (!c || !s || !s.biddingEnabled || c.status !== 'available') return false;
+    return !s.endsAt || new Date(s.endsAt) > new Date();
+  }
+
+  canBid(): boolean {
+    const c = this.car();
+    const u = this.auth.user();
+    if (!c || !u) return false;
+    if (u.role === 'admin') return false;
+    const sellerId = typeof c.seller === 'object' ? (c.seller as User)._id : c.seller;
+    return sellerId !== u._id;
+  }
+
+  minNextBid(): number {
+    const s = this.bidSummary();
+    if (!s) return 0;
+    return s.highest > 0 ? s.highest + 1 : s.minBid || 1;
+  }
+
+  submitBid() {
+    const car = this.car();
+    if (!car) return;
+    if (!this.auth.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+    this.bidError.set('');
+    this.bidSuccess.set('');
+    if (!this.bidAmount || this.bidAmount < this.minNextBid()) {
+      this.bidError.set(`Enter at least ₹${this.minNextBid().toLocaleString('en-IN')}.`);
+      return;
+    }
+    this.bidSubmitting.set(true);
+    this.bidService.place(car._id, this.bidAmount, this.bidNote).subscribe({
+      next: () => {
+        this.bidSubmitting.set(false);
+        this.bidSuccess.set('Your bid was placed. You will be notified if someone outbids you.');
+        this.bidAmount = null;
+        this.bidNote = '';
+        this.loadBids(car._id);
+      },
+      error: (err) => {
+        this.bidSubmitting.set(false);
+        this.bidError.set(err.error?.message || 'Could not place bid');
+      },
+    });
   }
 
   toggleWishlist() {

@@ -379,3 +379,79 @@
   margin: 0.4rem 0 0;
   line-height: 1.5;
 }
+
+.invest-box,
+.bid-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+
+  h3 {
+    margin: 0 0 0.4rem;
+    color: var(--text);
+    font-size: 1rem;
+  }
+}
+
+.bid-box {
+  border-color: var(--gold-dim);
+}
+
+.invest-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.6rem;
+
+  td {
+    padding: 0.4rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+    color: var(--text);
+  }
+
+  td:last-child {
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .cat {
+    display: inline-block;
+    text-transform: capitalize;
+    font-size: 0.7rem;
+    color: var(--gold);
+    border: 1px solid var(--gold-dim);
+    border-radius: 999px;
+    padding: 0 0.45rem;
+    margin-right: 0.35rem;
+  }
+
+  .sub td {
+    font-weight: 600;
+  }
+
+  .ask td {
+    color: var(--gold);
+    font-weight: 700;
+    border-bottom: none;
+  }
+}
+
+.bid-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 0.6rem;
+  margin: 0.6rem 0;
+
+  span {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+  }
+
+  strong {
+    color: var(--gold);
+    font-size: 1.05rem;
+  }
+}

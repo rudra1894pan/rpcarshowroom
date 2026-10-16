@@ -21,6 +21,31 @@ export interface CarInsurance {
   isTransferable?: boolean;
 }
 
+export interface ReconItem {
+  category: 'service' | 'repair' | 'modification' | 'paint' | 'tyres' | 'interior' | 'documents' | 'other';
+  description: string;
+  cost: number;
+}
+
+export interface Bid {
+  _id: string;
+  car: Car;
+  bidder: User | string;
+  amount: number;
+  note?: string;
+  status: 'active' | 'outbid' | 'accepted' | 'rejected' | 'withdrawn';
+  highest?: number;
+  createdAt: string;
+}
+
+export interface BidSummary {
+  biddingEnabled: boolean;
+  minBid: number;
+  endsAt?: string;
+  highest: number;
+  count: number;
+}
+
 export interface Car {
   _id: string;
   seller: string | User;
@@ -42,6 +67,14 @@ export interface Car {
   isActive: boolean;
   approvalStatus: 'pending' | 'approved' | 'rejected';
   insurance: CarInsurance;
+  purchasePrice?: number;
+  reconditioning?: ReconItem[];
+  reconditioningTotal?: number;
+  totalInvested?: number;
+  biddingEnabled?: boolean;
+  minBid?: number;
+  biddingEndsAt?: string;
+  soldPrice?: number;
   createdAt: string;
 }
 

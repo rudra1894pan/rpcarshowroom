@@ -36,6 +36,28 @@ const carSchema = new mongoose.Schema(
       default: 'pending',
     },
 
+    // What the dealer paid to acquire the car, and the money spent making it road-ready.
+    // Shown to buyers for transparency: purchase + work done = total invested, vs. asking price.
+    purchasePrice: { type: Number, min: 0 },
+    reconditioning: [
+      {
+        category: {
+          type: String,
+          enum: ['service', 'repair', 'modification', 'paint', 'tyres', 'interior', 'documents', 'other'],
+          default: 'other',
+        },
+        description: { type: String, trim: true, required: true },
+        cost: { type: Number, required: true, min: 0 },
+      },
+    ],
+
+    // Bidding: buyers can offer a price; seller/admin accepts the best one.
+    biddingEnabled: { type: Boolean, default: false },
+    minBid: { type: Number, min: 0 },
+    biddingEndsAt: Date,
+    soldPrice: Number,
+    soldTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+
     // Insurance details for this specific car.
     insurance: {
       type: {
@@ -50,6 +72,15 @@ const carSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+carSchema.virtual('reconditioningTotal').get(function () {
+  return (this.reconditioning || []).reduce((sum, r) => sum + (r.cost || 0), 0);
+});
+carSchema.virtual('totalInvested').get(function () {
+  return (this.purchasePrice || 0) + this.reconditioningTotal;
+});
+carSchema.set('toJSON', { virtuals: true });
+carSchema.set('toObject', { virtuals: true });
 
 carSchema.index({ make: 'text', model: 'text', title: 'text', city: 'text' });
 
