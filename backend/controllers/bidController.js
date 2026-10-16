@@ -50,12 +50,8 @@ exports.placeBid = async (req, res) => {
     if (car.minBid && amount < car.minBid) {
       return res.status(400).json({ message: `Minimum bid is ₹${car.minBid.toLocaleString('en-IN')}` });
     }
+    // Any bid at or above the minimum is allowed, even if it is lower than the current highest bid.
     const top = await highestActive(car._id);
-    if (top && amount <= top.amount) {
-      return res
-        .status(400)
-        .json({ message: `Your bid must be higher than the current highest bid (₹${top.amount.toLocaleString('en-IN')})` });
-    }
 
     // Replace this bidder's earlier active bids with the new one.
     await Bid.updateMany({ car: car._id, bidder: req.user._id, status: 'active' }, { status: 'outbid' });
@@ -68,7 +64,7 @@ exports.placeBid = async (req, res) => {
       `${req.user.name} bid ₹${amount.toLocaleString('en-IN')} on "${car.title}".`,
       '/seller/bids'
     );
-    if (top && top.bidder.toString() !== req.user._id.toString()) {
+    if (top && amount > top.amount && top.bidder.toString() !== req.user._id.toString()) {
       notify(
         top.bidder,
         'bid_outbid',

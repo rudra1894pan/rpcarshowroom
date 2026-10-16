@@ -110,8 +110,7 @@ export class CarDetailComponent implements OnInit {
 
   minNextBid(): number {
     const s = this.bidSummary();
-    if (!s) return 0;
-    return s.highest > 0 ? s.highest + 1 : s.minBid || 1;
+    return s?.minBid || 1;
   }
 
   submitBid() {
